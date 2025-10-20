@@ -1,0 +1,52 @@
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, Query } from '@nestjs/common';
+import { SucursalService } from './sucursal.service';
+import { CreateSucursalDto } from './dto/create-sucursal.dto';
+import { UpdateSucursalDto } from './dto/update-sucursal.dto';
+import { ACCION, Actions, Auth, IAuth, JwtAuthGuard } from 'src/core';
+import { ActionGuard } from 'src/core/guard/action.guard';
+import { QuerySucursalList } from './dto/query-sucursal-list.dto';
+import { QueryListDto } from 'src/core/dto/query-list.dto';
+
+@Controller({ version: "1", path: 'sucursal' })
+@UseGuards(JwtAuthGuard, ActionGuard)
+export class SucursalController {
+  constructor(private readonly sucursalService: SucursalService) { }
+
+  @Post()
+  @Actions(ACCION.CREAR_SUCURSAL)
+  create(
+    @Auth() auth: IAuth,
+    @Body() createSucursalDto: CreateSucursalDto
+  ) {
+    return this.sucursalService.create(auth, createSucursalDto);
+  }
+
+  @Get()
+  @Actions(ACCION.LISTAR_SUCURSAL)
+  findAll(
+    @Auth() auth: IAuth,
+    @Query() filtro:QueryListDto
+  ) {
+    return this.sucursalService.findAll(auth,filtro);
+  }
+
+  @Get(':id')
+  @Actions(ACCION.LISTAR_SUCURSAL)
+  findOne(@Auth() auth: IAuth,
+    @Param('id', ParseIntPipe) id: number) {
+    return this.sucursalService.findOne(auth, id);
+  }
+
+  @Patch(':id')
+  @Actions(ACCION.EDITAR_SUCURSAL)
+  update(@Auth() auth: IAuth,
+    @Param('id', ParseIntPipe) id: number, @Body() updateSucursalDto: UpdateSucursalDto) {
+    return this.sucursalService.update(auth, id, updateSucursalDto);
+  }
+
+  @Delete(':id')
+  @Actions(ACCION.ELIMINAR_SUCURSAL)
+  remove(@Auth() auth: IAuth, @Param('id', ParseIntPipe) id: number) {
+    return this.sucursalService.remove(auth, id);
+  }
+}

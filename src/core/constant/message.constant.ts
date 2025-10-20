@@ -1,0 +1,20 @@
+export const MSG = {
+    USER_EXIST: "Ups!, el usuario ya se encuentra utilizado",
+    NOT_ACTION: "Ups!, acción no permitida",
+    NOT_ACCESS_DOMAIN: "Ups!, no tiene acceso al dominio para completar el registro",
+    UPDATE: "Ups!, no se puede actualizar el registro",
+    SAVE: "Ups!, no se ha podido guardar el registro",
+    DELETE: "Ups!, no se ha podido eliminar el registro",
+    LIST: "Upds!, no se ha podido listar los registros",
+    NOT_USER_FOUND: "Ups!, no se ha encontrado el usuario",
+    NOT_USER_AVAILABLE: "Ups!, usuario no disponible",
+    INVALID_CREDENTIALS: "Credenciales invalidas",
+    NOT_FOUND_SECRET: "Ups!, no se ha encontrado las claves de acceso",
+    NOT_AUTHORIZATION: "Ups!, no se ha encontrado el token de acceso",
+    NOT_ACCESS: "Ups!, acceso denegado",
+    SELECT_DOMAIN: "Ups!, debe seleccionar un dominio para continuar",
+    NOT_FOUND: "Ups!, no se ha encontrado ningún registro",
+    NOT_FOUND_RELATIONSHIP: "Ups!, no se ha encontrado resultados para vincular los registros",
+    NOT_AVAILABLE_PERMISSION:"Ups!, permisos no disponibles",
+    NOT_AVAILABLE_ACCESS_DOMAIN:"Ups!, no se ha podido cargar los dominios"
+}

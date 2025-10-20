@@ -1,0 +1,73 @@
+<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><help_text>Space for diagram notes</help_text><element><id>UMLClass</id><coordinates><x>40</x><y>80</y><w>190</w><h>120</h></coordinates><panel_attributes>concepto
+--
+id: int
+enum: int // categoria
+value: int // valor enum
+concepto: varchar 150
+activo: boolean default true</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>360</x><y>0</y><w>220</w><h>170</h></coordinates><panel_attributes>usuario_dominio
+--
+id: int
+alias: varchar 200 nullable
+razon_social: varchar 200
+identificador: varchar 20
+codigo_pais: int nullable
+celular: int nullable
+estado: varchar 10 default ACTIVO
+logo: text nullable
+es_publico: boolan default false
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>720</x><y>200</y><w>220</w><h>90</h></coordinates><panel_attributes>permiso_usuario
+--
+id: int
+nombre: varchar 255
+estado: varchar 10 default ACTIVO
+es_editable: boolean default true</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1090</x><y>210</y><w>180</w><h>70</h></coordinates><panel_attributes>permiso_accion
+--
+id: int
+accion: int // ACCION ENUM
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>370</x><y>280</y><w>220</w><h>130</h></coordinates><panel_attributes>credencial
+--
+id: int
+usuario: varchar 200
+password: varchar  255 nullable
+identificador: varchar 100 nulltable
+estrategia: varchar 100 // N/G/F
+estado: varchar 10 default ACTIVO
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>380</x><y>570</y><w>200</w><h>150</h></coordinates><panel_attributes>usuario_persona
+--
+id: int
+alias: varchar 100 nullable
+nombre_completo: varchar 200
+identificador: varchar 20 nullable
+codigo_pais: int nullable
+celular: int nullable
+es_visible: boolean default true
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>720</x><y>430</y><w>210</w><h>90</h></coordinates><panel_attributes>usuario_acceso_dominio
+--
+id: int
+seleccionado: boolean default false
+es_principal: boolean default false
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>570</x><y>70</y><w>310</w><h>150</h></coordinates><panel_attributes>lt=-
+m1=1
+m2=1
+tiene</panel_attributes><additional_attributes>10;20;280;20;280;130</additional_attributes></element><element><id>Relation</id><coordinates><x>810</x><y>280</y><w>90</w><h>170</h></coordinates><panel_attributes>lt=-
+m1=1
+m2=1..n
+pertenece</panel_attributes><additional_attributes>10;10;10;150</additional_attributes></element><element><id>Relation</id><coordinates><x>490</x><y>400</y><w>250</w><h>110</h></coordinates><panel_attributes>lt=-
+m1=1
+m2=1..n
+accede</panel_attributes><additional_attributes>10;10;10;80;230;80</additional_attributes></element><element><id>Relation</id><coordinates><x>930</x><y>230</y><w>180</w><h>50</h></coordinates><panel_attributes>lt=-
+m1=1
+m2=1..n
+dispone</panel_attributes><additional_attributes>10;20;160;20</additional_attributes></element><element><id>Relation</id><coordinates><x>420</x><y>400</y><w>70</w><h>190</h></coordinates><panel_attributes>lt=-
+m1=1..0
+m2=1
+accede</panel_attributes><additional_attributes>10;10;10;170</additional_attributes></element><element><id>UMLClass</id><coordinates><x>30</x><y>290</y><w>190</w><h>90</h></coordinates><panel_attributes>usuario_acceso_sesion
+--
+id: int
+refresh_token: text nullable
+user_agent: text nulldable
+ip: varchar 40 nullable
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>210</x><y>320</y><w>180</w><h>50</h></coordinates><panel_attributes>lt=-
+m1=1..n
+m2=1
+pertenece</panel_attributes><additional_attributes>10;20;160;20</additional_attributes></element></diagram>

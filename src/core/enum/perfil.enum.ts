@@ -1,0 +1,18 @@
+export enum PERFIL {
+    // MANEJO TUVI
+    ADMIN = 1,
+    AGENCIA = 10,
+    EXTERNO = 11,
+    //LOS DE LA APLICACION TUVI
+    USUARIO=12,
+    // EMPRESA TUVI
+    EMPRESA = 30,
+    ADMINISTRADOR = 31,
+    VENDEDOR = 32,
+    CONDUCTOR = 34,
+    AYUDANTE = 35,
+    AZAFATA = 36,
+    CONTADOR = 37,
+    MECANICO = 38,
+    COMERCIAL = 39,
+}

@@ -1,0 +1,8 @@
+export enum CATEGORIA {
+    ACCION = 1,
+    // ARRAY SELECCION DEL USUARIO
+    PERFIL = 100,
+    // GRUPO = 101,
+    // SUCURSAL_GRUPO = 102,
+    // DOMINIOS = 103
+}

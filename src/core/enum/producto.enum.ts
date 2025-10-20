@@ -1,0 +1,4 @@
+export enum TIPO_PRODUCTO {
+    SERVICIO = 1,
+    INVENTARIABLE = 2
+}
