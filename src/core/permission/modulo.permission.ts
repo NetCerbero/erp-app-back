@@ -1,6 +1,8 @@
 import { ESTADO } from "../constant";
 import { ADMINISTRACION_PAGES } from "./administracion.permission";
+import { COMPRA_PAGES } from "./compra.permission";
 import { ACCOUNT_PAGES } from "./contabilidad.permission";
+import { INVENTARIO_PAGES } from "./inventario.permission";
 import { PERMISO_PAGES } from "./permiso.permission";
 import { PRODUCTO_PAGES } from "./producto.permission";
 import { SUCURSAL_PAGES } from "./sucursal.permission";
@@ -64,6 +66,22 @@ export const MODULOS = [
         mostrarEnMenu: true,
         icono: "Inbox",
         paginas: VENTA_PAGES
+    },
+    {
+        nombre: "Compra",
+        orden: 1,
+        estado: ESTADO.ACTIVO,
+        mostrarEnMenu: true,
+        icono: "Inbox",
+        paginas: COMPRA_PAGES
+    },
+    {
+        nombre:"Inventario",
+        orden: 1,
+        estado: ESTADO.ACTIVO,
+        mostrarEnMenu: true,
+        icono: "Inbox",
+        paginas: INVENTARIO_PAGES
     }
 ]
 

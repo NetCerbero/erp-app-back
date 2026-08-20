@@ -14,8 +14,8 @@ import { Sucursal } from '../../sucursal/entities/sucursal.entity';
 
 @Entity('usuario_persona')
 export class Persona extends BaseMeta {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn({type:"bigint"})
+  id: number;
 
   @Column({ type: 'varchar', length: 100, nullable: true })
   alias?: string;

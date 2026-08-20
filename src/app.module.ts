@@ -9,6 +9,11 @@ import { SucursalModule } from './modules/sucursal/sucursal.module';
 import { ConceptoModule } from './modules/concepto/concepto.module';
 import { ContabilidadModule } from './modules/contabilidad/contabilidad.module';
 import { UbicacionModule } from './modules/ubicacion/ubicacion.module';
+import { ProductoModule } from './modules/producto/producto.module';
+import { ArchivoModule } from './modules/archivo/archivo.module';
+import { CompraModule } from './modules/compra/compra.module';
+import { InventarioModule } from './modules/inventario/inventario.module';
+import { CodigoCorrelativoModule } from './modules/codigo-correlativo/codigo-correlativo.module';
 
 @Module({
   imports: [
@@ -21,7 +26,12 @@ import { UbicacionModule } from './modules/ubicacion/ubicacion.module';
     SucursalModule,
     ConceptoModule,
     ContabilidadModule,
-    UbicacionModule
+    UbicacionModule,
+    ProductoModule,
+    ArchivoModule,
+    CompraModule,
+    InventarioModule,
+    CodigoCorrelativoModule
   ],
 })
 export class AppModule {

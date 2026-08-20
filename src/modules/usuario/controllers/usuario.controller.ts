@@ -29,7 +29,7 @@ export class UsuarioController {
   @Get(':id')
   @Actions(ACCION.LISTAR_USUARIO)
   findOne(@Auth() auth: IAuth, @Param('id', ParseUUIDPipe) id: string) {
-    return this.usuarioService.findOne(auth, id);
+    return this.usuarioService.findOne(auth, +id);
   }
 
   @Patch(':id')
@@ -41,7 +41,7 @@ export class UsuarioController {
   @Delete(':id')
   @Actions(ACCION.ELIMINAR_USUARIO)
   remove(@Auth() auth: IAuth, @Param('id') id: string) {
-    return this.usuarioService.remove(auth, id);
+    return this.usuarioService.remove(auth, +id);
   }
 
 }

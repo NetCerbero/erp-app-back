@@ -24,7 +24,7 @@ export class PersonaRepository extends Repository<Persona> {
             .getMany()
     }
 
-    async getAllRelById(id: string) {
+    async getAllRelById(id: number) {
         const query = this.createQueryBuilder("p")
             .select()
             .addSelect("c.usuario")
@@ -35,7 +35,7 @@ export class PersonaRepository extends Repository<Persona> {
             //.leftJoinAndSelect("p.perfiles", "pp")
             .leftJoinAndSelect("d.permiso", "cp")
             .leftJoinAndSelect("cp.acciones", "cpa")
-            .where("p.id = :id", { id })
+            .where("c.id = :id", { id })
 
         return await query.getOne()
     }

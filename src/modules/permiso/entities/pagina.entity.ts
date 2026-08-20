@@ -20,7 +20,7 @@ export class Pagina extends BaseEntity {
     @Column({ type: "int", default: 1 })
     orden: number
 
-    @Column({ type: "varchar", length: 10, default: ESTADO.ACTIVO })
+    @Column({ type: "smallint", default: ESTADO.ACTIVO })
     estado: ESTADO
 
     @Column({ type: "bool", name: "visible_en_menu", default: false })

@@ -7,8 +7,8 @@ import { Persona } from "./persona.entity";
 @Entity("usuario_credencial")
 @Unique("credencial", ["usuario", "identificador", "estrategia"])
 export class Credencial extends BaseMeta {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+    @PrimaryGeneratedColumn({type:"bigint"})
+    id: number;
 
     @Column({ type: "varchar", length: 200, select: false })
     usuario: string;
@@ -22,12 +22,12 @@ export class Credencial extends BaseMeta {
     @Column({ type: "varchar", length: 100, default: ESTRATEGIA_SESION.NORMAL })
     estrategia?: ESTRATEGIA_SESION;
 
-    @Column({ type: "varchar", length: 10, default: ESTADO.ACTIVO })
+    @Column({ type: "smallint", default: ESTADO.ACTIVO })
     estado?: ESTADO
 
     // relaciones
     @Column({ name: "persona_id" })
-    personaId: string;
+    personaId: number;
 
     @OneToOne(() => Persona, c => c.credencial)
     @JoinColumn({ name: "persona_id" })

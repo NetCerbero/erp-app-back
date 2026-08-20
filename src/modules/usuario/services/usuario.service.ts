@@ -63,7 +63,7 @@ export class UsuarioService {
     return plainToInstance(UsuarioRspDto, lista, { strategy: "excludeAll" })
   }
 
-  async findOne(auth: IAuth, id: string) {
+  async findOne(auth: IAuth, id: number) {
     return await this.personRep.findOne({
       where: { id, empresaId: In(auth.accesos), credencial: { dominios: { empresa: { estado: ESTADO.ACTIVO } } } },
       relations: [
@@ -76,18 +76,18 @@ export class UsuarioService {
     return `This action updates a #${id} usuario`;
   }
 
-  async remove(auth: IAuth, id: string) {
+  async remove(auth: IAuth, id: number) {
     await this.personRep.softDelete({id,empresaId:auth.dominio})
   }
 
-  async searchDetailById(id: string) {
+  async searchDetailById(id: number) {
     return await this.personRep.findOne({
       where: { id: id },
       relations: ["empresa", "sucursal", "sucursal.ubicacion"]
     })
   }
 
-  async getAllRelById(id: string) {
+  async getAllRelById(id: number) {
     return await this.personRep.getAllRelById(id)
   }
 }

@@ -22,7 +22,7 @@ export class Dominio extends BaseMeta {
     @Column({ type: "int", nullable: true })
     celular?: number;
 
-    @Column({ type: "varchar", length: 10, default: ESTADO.ACTIVO })
+    @Column({ type: "smallint", default: ESTADO.ACTIVO })
     estado?: ESTADO;
 
     @Column({ type: "text", nullable: true })

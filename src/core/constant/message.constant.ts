@@ -16,5 +16,11 @@ export const MSG = {
     NOT_FOUND: "Ups!, no se ha encontrado ningún registro",
     NOT_FOUND_RELATIONSHIP: "Ups!, no se ha encontrado resultados para vincular los registros",
     NOT_AVAILABLE_PERMISSION:"Ups!, permisos no disponibles",
-    NOT_AVAILABLE_ACCESS_DOMAIN:"Ups!, no se ha podido cargar los dominios"
+    NOT_AVAILABLE_ACCESS_DOMAIN:"Ups!, no se ha podido cargar los dominios",
+    ALMACEN_PRINCIPAL_EXISTE:"Ups!, ya existe un almacen principal.",
+    SIN_SUCURSAL: "Ups!, no tiene una sucursal asignada.",
+    INVENTARIO_INICIAL_CARGADO: "Ups!, el almacén ya tiene registrado un inventario inicial.",
+    INVENTARIO_EXISTE_MOVIMIENTO: 'Ups!, el almacén ya tiene movimientos de inventario, no es posible registrar un inventario inicial.',
+    ALMACEN_NOT_EXISTS: "Ups!, el almacén no existe.",
+    ALMACEN_NOT_DESTINO: "Ups!, almacén destino debe ser ingresado."
 }

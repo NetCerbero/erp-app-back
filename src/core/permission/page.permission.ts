@@ -44,5 +44,19 @@ export const PAGE = {
     CREATE: '/account-create',
     LIST: '/account-list',
     EDIT: '/account-edit/:id',
+    NOTE: '/account-note',
   },
+  ALMACEN: {
+    LIST: '/listar-almacen/:sucursalId',
+    CREATE: '/crear-almacen',
+    EDIT: '/editar-almacen/:id',
+  },
+  COMPRA:{
+    LIST: "/listar-compra",
+    CREATE: "/crear-compra"
+  },
+  INVENTARIO:{
+    LISTAR_OPERACION: "/listar-operacion",
+    CREAR_OPERACION: "/crear-operacion"
+  }
 };

@@ -11,7 +11,7 @@ export class Accion extends BaseEntity {
     @Column({ type: "int" })
     accion: ACCION;
 
-    @Column({ type: "varchar", length: 10, default: ESTADO.ACTIVO })
+    @Column({ type: "smallint", default: ESTADO.ACTIVO })
     estado: ESTADO
 
     @Column({ name: "pagina_id" })

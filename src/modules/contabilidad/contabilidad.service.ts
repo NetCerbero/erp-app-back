@@ -1,23 +1,53 @@
-import { ConflictException, Injectable } from '@nestjs/common';
-import { CreateContabilidadDto } from './dto/create-contabilidad.dto';
-import { UpdateContabilidadDto } from './dto/update-contabilidad.dto';
+import { ConflictException, Injectable, Logger } from '@nestjs/common';
+import {
+  CreateCuentaDto,
+  CreatePlanCuentaMasivoDto,
+} from './dto/create-contabilidad.dto';
+import { UpdateCuentadDto } from './dto/update-contabilidad.dto';
 import { buildContabilidadTree, toBuildContabilidadTree } from './utils';
-import { PlanCuentaRepository } from './repositories/plancuenta.repository';
+import { CuentaRepository } from './repositories/cuenta.repository';
 import { IAuth } from 'src/core';
+import { Cuenta } from './entities/cuenta.entity';
 
 @Injectable()
 export class ContabilidadService {
-  constructor(private readonly planCuentaRep: PlanCuentaRepository) {}
+  constructor(private readonly cuentaRep: CuentaRepository) {}
 
-  create(createContabilidadDto: CreateContabilidadDto) {
-    return 'creado';
+  async create(auth: IAuth, params: CreateCuentaDto) {
+    let superior: Cuenta | null = null;
+    if (params.cuentaSuperiorId) {
+      superior = await this.cuentaRep.findOne({
+        where: { empresaId: auth.dominio, id: params.cuentaSuperiorId },
+      })!;
+    }
+
+    console.log(params);
+    //throw new ConflictException("asdsa")
+    const { codigoAnalitico, ...rst } = params;
+    const codigo = superior
+      ? `${superior!.codigo}.${params.codigo}`
+      : params.codigo;
+    try {
+      await this.cuentaRep.save({
+        ...rst,
+        codigo,
+        nivel: superior ? superior!.nivel + 1 : 1,
+        empresaId: auth.dominio,
+        ...(codigoAnalitico && codigoAnalitico.length > 0
+          ? { analiticos: codigoAnalitico.map((c) => ({ codigoAnalitico: c })) }
+          : {}),
+      });
+    } catch (error) {
+      Logger.error(error.message, 'CREAR CUENTA');
+      throw new ConflictException('No se ha podido crear la cuenta');
+    }
   }
 
-  async crearPlanCuenta(auth: IAuth, data: CreateContabilidadDto) {
+  async crearPlanCuenta(auth: IAuth, data: CreatePlanCuentaMasivoDto) {
     const items = toBuildContabilidadTree(auth, data.lista);
     //eliminar el plan de cuentas actual
-    await this.planCuentaRep.softDelete({empresaId: auth.dominio})
-    return await this.planCuentaRep.save(items);
+    await this.cuentaRep.softDelete({ empresaId: auth.dominio });
+    return await this.cuentaRep.save(items);
   }
 
   fakeServerRequest<T>(data: T, delay = 1500): Promise<T> {
@@ -34,16 +64,18 @@ export class ContabilidadService {
   }
 
   async findAll(auth: IAuth) {
-    const lista = await this.planCuentaRep.find({where:{empresaId: auth.dominio}})
-    console.log(lista)
-    return buildContabilidadTree(lista)
+    const lista = await this.cuentaRep.find({
+      where: { empresaId: auth.dominio },
+    });
+    console.log(lista);
+    return buildContabilidadTree(lista);
   }
 
   findOne(id: number) {
     return `This action returns a #${id} contabilidad`;
   }
 
-  update(id: number, updateContabilidadDto: UpdateContabilidadDto) {
+  update(id: number, updateContabilidadDto: UpdateCuentadDto) {
     return `This action updates a #${id} contabilidad`;
   }
 

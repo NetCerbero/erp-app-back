@@ -2,12 +2,13 @@ import { Module } from '@nestjs/common';
 import { ContabilidadService } from './contabilidad.service';
 import { ContabilidadController } from './contabilidad.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PlanCuenta } from './entities/contabilidad.entity';
-import { PlanCuentaRepository } from './repositories/plancuenta.repository';
+import { Cuenta } from './entities/cuenta.entity';
+import { CuentaRepository } from './repositories/cuenta.repository';
+import { CuentaAnalitico } from './entities/cuenta-analitico.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([PlanCuenta])],
+  imports: [TypeOrmModule.forFeature([Cuenta, CuentaAnalitico])],
   controllers: [ContabilidadController],
-  providers: [PlanCuentaRepository, ContabilidadService],
+  providers: [CuentaRepository, ContabilidadService],
 })
 export class ContabilidadModule {}

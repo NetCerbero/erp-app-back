@@ -1,5 +1,5 @@
 import { ConflictException, ForbiddenException, forwardRef, Inject, Injectable, Logger, UnauthorizedException } from "@nestjs/common";
-import { ESTADO, ESTRATEGIA_SESION, IAuth, IAuthTokenJwt, IRefreshTokenJwt, MSG } from "src/core";
+import { ACCION, ESTADO, ESTRATEGIA_SESION, IAuth, IAuthTokenJwt, IRefreshTokenJwt, MSG } from "src/core";
 import { CredencialRepository } from "../usuario/repositories/credencial.repository";
 import { compare } from 'bcryptjs';
 import { JwtService } from "@nestjs/jwt";
@@ -14,11 +14,11 @@ import { AuthDto } from "./dto/auth.dto";
 import { PermisoService } from "../permiso/permiso.service";
 import { plainToInstance } from "class-transformer";
 import { WhoamiRspDto } from "./dto/whoami.rsp.dto";
-import { In } from "typeorm";
-import { AccesoDominioDto, DominioRspDto } from "../usuario/dto";
+import { DominioRspDto } from "../usuario/dto";
 import { AccesoDominoRepository } from "../usuario/repositories/acceso-dominio.repository";
 import { AccesoDominio } from "../usuario/entities/acceso-dominio.entity";
 import { ConfigService } from "@nestjs/config";
+import { In } from "typeorm";
 
 
 @Injectable()
@@ -72,26 +72,28 @@ export class AuthService {
         if (!dominioSeleccionado) throw new ConflictException(MSG.SELECT_DOMAIN)
         const perfiles = [] //authUser.perfiles.map(p => p.valor)
         const actions = dominioSeleccionado.permiso.acciones || []
+        const mapPermisos = new Map<ACCION,boolean>()
+        actions.map(a => mapPermisos.set(a.accion,true))
         const auth: IAuth = {
             ...payload,
             dominio: dominioSeleccionado.empresa.id,
             perfiles,
             accesos: listDomain.map(e => e.empresa.id),
-            permisos: actions.map(a => a.accion),// [ACCION.CREAR_PERMISO, ACCION.LISTAR_PERMISO, ACCION.EDITAR_PERMISO, ACCION.ELIMINAR_PERMISO]
+            permisos:mapPermisos, // actions.map(a => a.accion),// [ACCION.CREAR_PERMISO, ACCION.LISTAR_PERMISO, ACCION.EDITAR_PERMISO, ACCION.ELIMINAR_PERMISO]
             // sucursales a las que tiene acceso
             sucursal: authUser.sucursalId,//la que esta registrada por defecto
             sucursales: [authUser.sucursalId]
         }
-        console.log(auth)
+        //console.log(auth)
         return auth
     }
 
-    private getAccessToken(user: Persona, configServer: Map<ConfigLocalKey, string>, sesion: string) {
+    private getAccessToken(user: Persona, configServer: Map<ConfigLocalKey, string>, sesion: number) {
         const expiresInAccess = configServer.get(ConfigLocalKey.ACCESS_TOKEN_TIME) || '15m';
         const secretAccess = configServer.get(ConfigLocalKey.SECRET_ACCESS_TOKEN)
         if (!secretAccess) throw new ConflictException(MSG.NOT_FOUND_SECRET)
         const auth: IAuthTokenJwt = {
-            id: user.id,
+            id: user.credencial.id,
             estrategia: user.credencial.estrategia!,
             dominio: user.empresaId,
             usuario: user.credencial.usuario,
@@ -147,6 +149,7 @@ export class AuthService {
             ])
             return { ...tokens, usuario }
         } catch (error) {
+            console.log(error)
             Logger.error(error?.message, "LOGIN")
             throw new ConflictException(MSG.INVALID_CREDENTIALS)
         }
@@ -242,5 +245,24 @@ export class AuthService {
         listUpdate.length > 0 && await this.accessDomainRep.save(listUpdate)
 
         return {selected}
+    }
+
+    async listarPorIds( credencialIds:number[]){
+        if(credencialIds.length == 0) return []
+        return await this.credencialRep.find({
+            select:{
+                id: true,
+                usuario:true,
+                persona:{
+                    id: true,
+                    nombreCompleto:true,
+                    alias: true
+                }
+            },
+            where: {
+                id: In(credencialIds)
+            },
+            relations:["persona"]
+        })
     }
 }

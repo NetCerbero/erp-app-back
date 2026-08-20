@@ -15,7 +15,7 @@ export class Ubicacion extends BaseMeta {
     @Column({ type: "bool", name: "es_publico", default: true })
     esPublico: boolean
 
-    @Column({ type: "varchar", length: 10, default: ESTADO.ACTIVO })
+    @Column({ type: "smallint", default: ESTADO.ACTIVO })
     estado: ESTADO
 
     // Relacion

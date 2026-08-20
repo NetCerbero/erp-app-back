@@ -9,8 +9,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ContabilidadService } from './contabilidad.service';
-import { CreateContabilidadDto } from './dto/create-contabilidad.dto';
-import { UpdateContabilidadDto } from './dto/update-contabilidad.dto';
+import {
+  CreateCuentaDto,
+  CreatePlanCuentaMasivoDto,
+} from './dto/create-contabilidad.dto';
+import { UpdateCuentadDto } from './dto/update-contabilidad.dto';
 import { ACCION, Actions, Auth, IAuth, JwtAuthGuard } from 'src/core';
 import { ActionGuard } from 'src/core/guard/action.guard';
 
@@ -19,14 +22,17 @@ import { ActionGuard } from 'src/core/guard/action.guard';
 export class ContabilidadController {
   constructor(private readonly contabilidadService: ContabilidadService) {}
 
-  @Post()
-  create(@Body() createContabilidadDto: CreateContabilidadDto) {
-    return this.contabilidadService.create(createContabilidadDto);
+  @Post("/cuenta")
+  create(@Auth() auth: IAuth, @Body() createContabilidadDto: CreateCuentaDto) {
+    return this.contabilidadService.create(auth, createContabilidadDto);
   }
 
   @Post('plan-cuenta')
   @Actions(ACCION.CREAR_PLAN_CUENTA)
-  createPlanCuenta(@Body() data: CreateContabilidadDto, @Auth() auth: IAuth) {
+  createPlanCuenta(
+    @Body() data: CreatePlanCuentaMasivoDto,
+    @Auth() auth: IAuth,
+  ) {
     console.log('aqui va');
     return this.contabilidadService.crearPlanCuenta(auth, data);
   }
@@ -44,7 +50,7 @@ export class ContabilidadController {
   @Patch(':id')
   update(
     @Param('id') id: string,
-    @Body() updateContabilidadDto: UpdateContabilidadDto,
+    @Body() updateContabilidadDto: UpdateCuentadDto,
   ) {
     return this.contabilidadService.update(+id, updateContabilidadDto);
   }

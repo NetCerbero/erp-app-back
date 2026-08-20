@@ -1,9 +1,11 @@
 import { IAuth, TIPO_CUENTA } from 'src/core';
 import { ItemPlanCuentaMasivoDto } from './dto/create-contabilidad.dto';
-import { PlanCuenta } from './entities/contabilidad.entity';
+import { Cuenta } from './entities/cuenta.entity';
+import { CuentaAnalitico } from './entities/cuenta-analitico.entity';
 
-type PlanCuentaPartial = Partial<PlanCuenta> & {
+type PlanCuentaPartial = Partial<Omit<Cuenta, 'listaCuenta' | 'analiticos'>> & {
   listaCuenta?: PlanCuentaPartial[];
+  analiticos?: Partial<CuentaAnalitico>[];
 };
 
 export function toBuildContabilidadTree(
@@ -22,7 +24,9 @@ export function toBuildContabilidadTree(
     const node: PlanCuentaPartial = {
       codigo: item.CODIGO,
       cuenta: item.CUENTA,
-      codigoAnalitico: item['CODIGO ANALITICO'],
+      analiticos: (item?.['CODIGO ANALITICO']?.split(',') || []).map((v) => ({
+        codigoAnalitico: +v,empresaId: auth.dominio
+      })),
       esImputable: item.IMPUTABLE == 'SI',
       nivel: undefined,
       empresaId: auth.dominio,
@@ -54,20 +58,17 @@ export function toBuildContabilidadTree(
   return clean(root);
 }
 
-
-export function buildContabilidadTree(
-  data: PlanCuenta[],
-): any[] {
+export function buildContabilidadTree(data: Cuenta[]): any[] {
   // Ordenamos los códigos para asegurar que los padres van antes que los hijos
   const sorted = [...data].sort((a, b) =>
     a.codigo.localeCompare(b.codigo, undefined, { numeric: true }),
   );
-  const map = new Map<string, PlanCuenta>();
+  const map = new Map<string, Cuenta>();
 
-  const root: PlanCuenta[] = [];
+  const root: Cuenta[] = [];
 
   for (const item of sorted) {
-    const node: PlanCuenta = PlanCuenta.create({
+    const node: Cuenta = Cuenta.create({
       ...item,
       listaCuenta: [],
     });
@@ -83,7 +84,7 @@ export function buildContabilidadTree(
     }
   }
   // Limpieza: eliminamos children vacíos
-  const clean = (nodes: PlanCuenta[]): any[] => {
+  const clean = (nodes: Cuenta[]): any[] => {
     return nodes.map((n) => ({
       ...n,
       listaCuenta:

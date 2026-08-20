@@ -18,7 +18,7 @@ export class Permiso extends BaseMeta {
   @Column({ type: 'varchar', length: 255 })
   nombre: string;
 
-  @Column({ type: 'varchar', length: 10, default: ESTADO.ACTIVO })
+  @Column({ type: 'smallint', default: ESTADO.ACTIVO })
   estado: ESTADO;
 
   @Column({ name: 'es_editable', type: 'bool', default: true })

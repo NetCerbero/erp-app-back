@@ -3,8 +3,8 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('usuario_acceso_sesion')
 export class AccesoSesion extends BaseMeta {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn({ type: 'bigint' })
+  id: number;
 
   @Column({ type: 'text', name: 'refresh_token', nullable: true })
   refreshToken: string;
@@ -15,6 +15,6 @@ export class AccesoSesion extends BaseMeta {
   @Column({ type: 'varchar', length: 40, nullable: true })
   ip: string;
 
-  @Column({ type: 'uuid', name: 'credencial_id' })
-  credencialId: string;
+  @Column({ type: 'bigint', name: 'credencial_id' })
+  credencialId: number;
 }

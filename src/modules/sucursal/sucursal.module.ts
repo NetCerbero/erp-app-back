@@ -2,13 +2,19 @@ import { Module } from '@nestjs/common';
 import { SucursalService } from './sucursal.service';
 import { SucursalController } from './sucursal.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Sucursal } from './entities/sucursal.entity';
 import { SucursalRepository } from './repositories/sucursal.repository';
+import { AlmacenService } from './almacen.service';
+import { AlmacenRepository } from './repositories/almacen.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Sucursal])],
+  imports: [TypeOrmModule.forFeature([SucursalRepository, AlmacenRepository])],
   controllers: [SucursalController],
-  providers: [SucursalService, SucursalRepository],
-  exports:[SucursalService]
+  providers: [
+    SucursalService,
+    AlmacenService,
+    SucursalRepository,
+    AlmacenRepository,
+  ],
+  exports: [SucursalService, AlmacenService],
 })
-export class SucursalModule { }
+export class SucursalModule {}

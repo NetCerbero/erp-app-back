@@ -2,11 +2,11 @@ import { ESTRATEGIA_SESION } from "../constant";
 import { ACCION, PERFIL } from "../enum";
 
 export interface IAuthTokenJwt {
-    id: string;
+    id: number;
     usuario: string;
     estrategia: ESTRATEGIA_SESION;
     dominio: number;
-    sesion: string;
+    sesion: number;
     nombreCompleto: string
 }
 
@@ -19,7 +19,7 @@ export interface IAuth extends IAuthTokenJwt {
     sucursal:number,
     sucursales:number[],
     perfiles: PERFIL[]
-    permisos: ACCION[]
+    permisos: Map<ACCION,boolean>
     accesos: number[]
     //grupos: number[]
 }

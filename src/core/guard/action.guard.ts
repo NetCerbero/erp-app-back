@@ -21,6 +21,6 @@ export class ActionGuard implements CanActivate {
 
     if (isPublic) return true;
     const { user }: { user: IAuth } = context.switchToHttp().getRequest();
-    return actions?.length > 0 ? actions?.some((action) => user?.permisos?.includes(action)) : true;
+    return actions?.length > 0 ? actions?.some((action) => user?.permisos?.get(action)) : true;
   }
 }

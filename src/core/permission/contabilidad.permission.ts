@@ -31,4 +31,20 @@ export const ACCOUNT_PAGES = [
       },
     ],
   },
+
+  {
+    nombre: 'APUNTES CONTABLES',
+    icono: 'Mail',
+    url: PAGE.ACCOUNT.CREATE,
+    visibleEnMenu: true,
+    acciones: [
+      {
+        accion: ACCION.CREAR_CUENTA,
+      },
+      { accion: ACCION.EDITAR_CUENTA },
+      {
+        accion: ACCION.ELIMINAR_CUENTA,
+      },
+    ],
+  },
 ];
