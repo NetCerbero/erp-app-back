@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { ProductoService } from './producto.service';
 import { CreateProductoDto } from './dto/create-producto.dto';
@@ -37,12 +38,6 @@ export class ProductoController {
   @Actions(ACCION.LISTAR_PRODUCTO)
   findAll(@Auth() auth: IAuth, @Query() filtro: QueryListDto) {
     return this.productoService.findAll(auth, filtro);
-  }
-
-  @Get('/pos')
-  @Actions(ACCION.REGISTRAR_VENTA)
-  findAllToPos(@Auth() auth: IAuth) {
-    return this.productoService.findAllToPos(auth);
   }
 
   @Get(':id')
@@ -76,5 +71,14 @@ export class ProductoController {
   @Get('listar/item-operacion')
   listarProductoOperacion(@Auth() auth: IAuth) {
     return this.productoService.listarProductoOperacion(auth);
+  }
+
+  @Get('listar/item-punto-venta/:sucursalId/:almacenId')
+  listarProductoPuntoVenta(
+    @Auth() auth: IAuth,
+    @Param("sucursalId", new ParseIntPipe()) sucursalId: number,
+    @Param("almacenId", new ParseIntPipe()) almacenId: number
+  ) {
+    return this.productoService.listarProductoPuntoVenta(auth, sucursalId, almacenId);
   }
 }

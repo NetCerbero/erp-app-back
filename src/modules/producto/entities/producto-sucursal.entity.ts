@@ -15,7 +15,6 @@ export class ProductoSucursal extends BaseMeta {
     @JoinColumn(({ name: "producto_id" }))
     producto: Producto
 
-
     @Column({ name: "sucursal_id" })
     sucursalId: number
 

@@ -17,16 +17,22 @@ export class InventarioMovimientoService {
     private readonly inventarioService: InventarioService,
   ) {}
 
-  async registrarTransaccion(manager: EntityManager, params: IMovimiento) {
+  async registrarTransaccion(
+    manager: EntityManager,
+    params: IMovimiento,
+    afectaCosto: boolean,
+  ) {
+    console.log("registrarTransaccion INV MOV",params)
     const movimiento = await manager.save(InventarioMovimiento, { ...params });
     const detalles: IInventario[] = movimiento.detalles.map((item) => ({
       almacenId: item.almacenId,
-      cantidad: item.signo * item.cantidad,
       empresaId: movimiento.empresaId,
       productoId: item.productoId,
+      cantidadUnidadBase: item.cantidadUnidadBase,
+      costoUnidadBase: item.costoUnitarioMonedaBase,
     }));
     Logger.debug('Registrando movimiento inventario', 'Movimiento Inventario');
-    await this.inventarioService.registrar(detalles, manager);
+    await this.inventarioService.registrar(detalles, afectaCosto, manager);
   }
 
   async existeMovimiento(

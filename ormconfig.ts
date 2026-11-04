@@ -14,6 +14,7 @@ const config = {
   synchronize: false,
   entities: ['src/modules/*/*/*.entity{.ts,.js}'], //[__dirname + '\\entities\\**\\*{.ts,.js}'],
   migrations: ['src/database/migrations/*{.ts,.js}'],
+  schema: process.env.ENV
 } as DataSourceOptions;
 
 export const dataSource = new DataSource(config);

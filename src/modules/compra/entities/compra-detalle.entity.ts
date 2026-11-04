@@ -6,11 +6,11 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Compra } from './compra.entity';
 import { Dominio } from '../../dominio/entities/dominio.entity';
+import { UnidadMedida } from 'src/modules/unidad-medida/entities/unidad-medida.entity';
 
 @Entity('compra_detalle')
 export class CompraDetalle extends BaseMeta {
@@ -19,37 +19,64 @@ export class CompraDetalle extends BaseMeta {
 
   @Column({
     type: 'numeric',
-    scale: 2,
-    precision: 15,
+    scale: 6,
+    precision: 18,
     transformer: new ColumnNumericTransformer(),
   })
   cantidad: number;
 
   @Column({
+    name: 'cantidad_base',
+    type: 'numeric',
+    scale: 6,
+    precision: 18,
+    transformer: new ColumnNumericTransformer(),
+  })
+  cantidadBase: number;
+
+  @Column({
     name: 'costo_unitario',
     type: 'numeric',
-    scale: 2,
-    precision: 15,
+    scale: 6,
+    precision: 18,
     transformer: new ColumnNumericTransformer(),
   })
   costoUnitario: number;
 
   @Column({
+    name: 'costo_unitario_moneda_base',
+    type: 'numeric',
+    scale: 6,
+    precision: 18,
+    transformer: new ColumnNumericTransformer(),
+  })
+  costoUnitarioMonedaBase: number;
+
+  @Column({
     name: 'total',
     type: 'numeric',
-    scale: 2,
+    scale: 6,
     precision: 18,
     transformer: new ColumnNumericTransformer(),
   })
   total: number;
 
-  //RELACION
-  @Column({ name: 'almacen_id' })
-  almacenId: number;
+  @Column({
+    name: 'total_moneda_base',
+    type: 'numeric',
+    scale: 6,
+    precision: 18,
+    transformer: new ColumnNumericTransformer(),
+  })
+  totalMonedaBase: number;
 
-  @ManyToOne(() => Almacen)
-  @JoinColumn({ name: 'almacen_id' })
-  almacen: Almacen;
+  //RELACION
+  @Column({ name: 'unidad_id' })
+  unidadId: number;
+
+  @ManyToOne(() => UnidadMedida)
+  @JoinColumn({ name: 'unidad_id' })
+  unidad: UnidadMedida;
 
   @Column({ name: 'producto_id' })
   productoId: number;

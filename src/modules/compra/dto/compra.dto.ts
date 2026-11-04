@@ -11,7 +11,7 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
-import { ESTADO_DOCUMENTO, TIPO_DOCUMENTO } from 'src/core';
+import { ESTADO_DOCUMENTO, MONEDA, TIPO_DOCUMENTO } from 'src/core';
 
 export class CrearDetalleCompraDto {
   @IsOptional()
@@ -30,7 +30,7 @@ export class CrearDetalleCompraDto {
 
   @IsDefined()
   @IsNumber()
-  almacenId: number;
+  unidadId: number;
 
   @IsDefined()
   @IsNumber()
@@ -48,7 +48,6 @@ export class CrearCompraDto {
 
   @IsDefined()
   @IsString()
-  @MaxLength(50)
   identificador: string;
 
   @IsDefined()
@@ -61,15 +60,31 @@ export class CrearCompraDto {
 
   @IsDefined()
   @IsNumber()
+  almacenId: number;
+
+  @IsDefined()
+  @IsNumber()
   estado: ESTADO_DOCUMENTO;
 
   @IsDefined()
   tipoComprobante: TIPO_DOCUMENTO;
 
   @IsDefined()
+  @IsNumber()
+  monedaId: MONEDA;
+
+  @IsDefined()
+  @IsNumber()
+  tipoCambio: number;
+
+  @IsOptional()
+  @IsNumber()
+  tipoCambioId?: number;
+
+  @IsDefined()
   @IsArray()
   @ArrayMinSize(1)
   @Type(() => CrearDetalleCompraDto)
-  @ValidateNested({each:true})
+  @ValidateNested({ each: true })
   detalles: CrearDetalleCompraDto[];
 }

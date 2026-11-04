@@ -11,6 +11,13 @@ export enum ESTADO_DOCUMENTO {
   ANULADO = 3,
 }
 
+export enum ESTADO_OPERACION{
+  BORRADOR=1,
+  PENDIENTE=5,
+  COMPLETADO=10,
+  ANULADO=15
+}
+
 export enum ANALITICO_CUENTA {
   PRODUCTO = 1,
   USUARIO = 2,

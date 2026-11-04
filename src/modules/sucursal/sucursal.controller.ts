@@ -15,7 +15,6 @@ import { CreateSucursalDto } from './dto/create-sucursal.dto';
 import { UpdateSucursalDto } from './dto/update-sucursal.dto';
 import { ACCION, Actions, Auth, IAuth, JwtAuthGuard } from 'src/core';
 import { ActionGuard } from 'src/core/guard/action.guard';
-import { QuerySucursalList } from './dto/query-sucursal-list.dto';
 import { QueryListDto } from 'src/core/dto/query-list.dto';
 import { AlmacenService } from './almacen.service';
 import { CreateAlmacenDto, UpdateAlmacenDto } from './dto/almacen.dto';
@@ -38,6 +37,14 @@ export class SucursalController {
   @Actions(ACCION.LISTAR_SUCURSAL)
   findAll(@Auth() auth: IAuth, @Query() filtro: QueryListDto) {
     return this.sucursalService.findAll(auth, filtro);
+  }
+
+  @Get("/listar-activos")
+  @Actions(ACCION.LISTAR_SUCURSAL, ACCION.LISTAR_ALMACEN, ACCION.CREAR_COMPRA)
+  listarSucursalAlmacenActivos(
+    @Auth() auth: IAuth,
+  ) {
+    return this.sucursalService.listarConAlmacenActivos(auth);
   }
 
   @Get(':id')

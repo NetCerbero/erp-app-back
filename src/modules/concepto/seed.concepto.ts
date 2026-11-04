@@ -2,7 +2,9 @@ import {
   ACCION,
   ANALITICO_CUENTA,
   CATEGORIA,
+  CATEGORIA_UNIDAD_MEDIDA,
   ESTADO_DOCUMENTO,
+  MONEDA,
   PERFIL,
   TIPO_COMPROBANTE,
   TIPO_CUENTA,
@@ -71,5 +73,26 @@ export const LIST_CONCEPTO = () => {
         concepto: key,
       });
     });
+  
+  Object.getOwnPropertyNames(CATEGORIA_UNIDAD_MEDIDA)
+    .filter((prop) => isNaN(parseInt(prop)))
+    .forEach((key) => {
+      list.push({
+        enum: CATEGORIA.UNIDAD_MEDIDA,
+        value: CATEGORIA_UNIDAD_MEDIDA[key],
+        concepto: key,
+      });
+    });
+  
+  Object.getOwnPropertyNames(MONEDA)
+    .filter((prop) => isNaN(parseInt(prop)))
+    .forEach((key) => {
+      list.push({
+        enum: CATEGORIA.MONEDA,
+        value: MONEDA[key],
+        concepto: key,
+      });
+    });
+    
   return list;
 };

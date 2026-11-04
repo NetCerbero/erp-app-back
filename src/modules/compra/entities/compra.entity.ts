@@ -2,7 +2,10 @@ import { Dominio } from '../../dominio/entities/dominio.entity';
 import {
   BaseMeta,
   ColumnNumericTransformer,
+  ESTADO,
   ESTADO_DOCUMENTO,
+  ESTADO_OPERACION,
+  MONEDA,
   TIPO_DOCUMENTO,
 } from '../../../core';
 import {
@@ -18,6 +21,9 @@ import {
 import { CompraDetalle } from './compra-detalle.entity';
 import { CompraEstado } from './compra-estado.entity';
 import { Sucursal } from '../../sucursal/entities/sucursal.entity';
+import { Concepto } from 'src/modules/concepto/entities/concepto.entity';
+import { Proveedor } from '../../proveedor/entities/proveedor.entity';
+import { Almacen } from 'src/modules/sucursal/entities/almacen.entity';
 
 @Entity('compra')
 export class Compra extends BaseMeta {
@@ -26,9 +32,6 @@ export class Compra extends BaseMeta {
 
   @Column()
   fecha: Date;
-
-  @Column({ name: 'proveedor_id' })
-  proveedorId: number;
 
   @Column({ type: 'varchar', length: 50, nullable: true })
   identificador: string;
@@ -47,15 +50,41 @@ export class Compra extends BaseMeta {
   })
   total: number;
 
+  @Column({
+    name: 'total_moneda_base',
+    type: 'numeric',
+    scale: 2,
+    precision: 15,
+    transformer: new ColumnNumericTransformer(),
+  })
+  totalMonedaBase: number;
+
+  @Column({
+    name: 'tipo_cambio',
+    type: 'numeric',
+    scale: 2,
+    precision: 15,
+    transformer: new ColumnNumericTransformer(),
+  })
+  tipoCambio: number;
+
+  // relacion
+  @Column({ name: 'moneda_id' })
+  monedaId: MONEDA;
+
+  @ManyToOne(() => Concepto, { createForeignKeyConstraints: false })
+  @JoinColumn({ name: 'moneda_id', referencedColumnName: 'value' })
+  moneda: Concepto;
+
   @OneToMany(() => CompraDetalle, (cp) => cp.compra, { cascade: true })
   detalles: CompraDetalle[];
 
   @Column({ name: 'estado_actual_id', nullable: true })
   estadoActualId: number;
 
-  @OneToOne(()=> CompraEstado,{createForeignKeyConstraints: false})
-  @JoinColumn({name:"estado_actual_id"})
-  estadoActual: CompraEstado
+  @OneToOne(() => CompraEstado, { createForeignKeyConstraints: false })
+  @JoinColumn({ name: 'estado_actual_id' })
+  estadoActual: CompraEstado;
 
   @OneToMany(() => CompraEstado, (estado) => estado.compra)
   estados: CompraEstado[];
@@ -73,4 +102,18 @@ export class Compra extends BaseMeta {
   @ManyToOne(() => Sucursal)
   @JoinColumn({ name: 'sucursal_id' })
   sucursal: Sucursal;
+
+  @Column({ name: 'almacen_id' })
+  almacenId: number;
+
+  @ManyToOne(() => Almacen)
+  @JoinColumn({ name: 'almacen_id' })
+  almacen: Almacen;
+
+  @Column({ name: 'proveedor_id' })
+  proveedorId: number;
+
+  @ManyToOne(() => Proveedor)
+  @JoinColumn({ name: 'proveedor_id' })
+  proveedor: Proveedor;
 }

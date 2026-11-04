@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSucursalDto } from './dto/create-sucursal.dto';
 import { UpdateSucursalDto } from './dto/update-sucursal.dto';
 import { SucursalRepository } from './repositories/sucursal.repository';
-import { IAuth, MSG, QueryListDto } from 'src/core';
+import { ESTADO, IAuth, MSG, QueryListDto } from 'src/core';
 import { In } from 'typeorm';
 
 @Injectable()
@@ -27,6 +27,32 @@ export class SucursalService {
     });
     console.log({ items });
     return items;
+  }
+
+  async listarConAlmacenActivos(auth: IAuth) {
+    const items = await this.sucursalRep.find({
+      where: {
+        empresaId: auth.dominio,
+        estado: ESTADO.ACTIVO,
+        almacenes: {
+          estado: ESTADO.ACTIVO,
+        },
+      },
+      relations: ['almacenes', 'ubicacion'],
+    });
+
+    const lista = items.map((e) => {
+      const almacenes = e.almacenes.map((a) => {
+        return {
+          almacenId: a.id,
+          sucursalId: e.id,
+          ubicacionId: e.ubicacion.id,
+          label: `${a.nombre} - ${e.identificador} (${e.ubicacion.abreviatura})`,
+        };
+      });
+      return almacenes;
+    });
+    return lista.flat();
   }
 
   async findOne(auth: IAuth, id: number) {

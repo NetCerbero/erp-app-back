@@ -77,9 +77,10 @@ export class AuthService {
         const auth: IAuth = {
             ...payload,
             dominio: dominioSeleccionado.empresa.id,
+            monedaBase: dominioSeleccionado.empresa.monedaBase,
             perfiles,
             accesos: listDomain.map(e => e.empresa.id),
-            permisos:mapPermisos, // actions.map(a => a.accion),// [ACCION.CREAR_PERMISO, ACCION.LISTAR_PERMISO, ACCION.EDITAR_PERMISO, ACCION.ELIMINAR_PERMISO]
+            permisos: mapPermisos, // actions.map(a => a.accion),// [ACCION.CREAR_PERMISO, ACCION.LISTAR_PERMISO, ACCION.EDITAR_PERMISO, ACCION.ELIMINAR_PERMISO]
             // sucursales a las que tiene acceso
             sucursal: authUser.sucursalId,//la que esta registrada por defecto
             sucursales: [authUser.sucursalId]

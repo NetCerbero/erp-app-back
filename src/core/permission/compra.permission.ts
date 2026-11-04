@@ -26,6 +26,9 @@ export const COMPRA_PAGES = [
       {
         accion: ACCION.CONFIRMAR_COMPRA,
       },
+      {
+        accion: ACCION.REGISTRAR_EN_OTRA_SUCURSAL_COMPRA,
+      },
     ],
   },
 ];

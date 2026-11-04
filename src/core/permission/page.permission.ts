@@ -31,14 +31,10 @@ export const PAGE = {
   PRODUCT: {
     LIST: '/product-list',
     CREATE: '/product-create',
-    EDIT: '/product-edit/:id',
+    EDIT: '/product-edit',
   },
   SALE: {
     CREATE: '/point-of-sale',
-  },
-  CASH: {
-    CREATE: '/cash-opening-create',
-    LIST: '/cash-opening-list',
   },
   ACCOUNT: {
     CREATE: '/account-create',
@@ -51,12 +47,26 @@ export const PAGE = {
     CREATE: '/crear-almacen',
     EDIT: '/editar-almacen/:id',
   },
-  COMPRA:{
-    LIST: "/listar-compra",
-    CREATE: "/crear-compra"
+  COMPRA: {
+    LIST: '/listar-compra',
+    CREATE: '/crear-compra',
   },
-  INVENTARIO:{
-    LISTAR_OPERACION: "/listar-operacion",
-    CREAR_OPERACION: "/crear-operacion"
+  INVENTARIO: {
+    LISTAR_OPERACION: '/listar-operacion',
+    CREAR_OPERACION: '/crear-operacion',
+  },
+  CAJA: {
+    CREATE: '/cash-opening-create',
+    LIST: '/cash-opening-list',
+  },
+  LISTA_PRECIO: {
+    CREAR: '/crear-lista-precio',
+    LISTAR: '/lista-precio',
+    EDITAR: "/editar-lista-precio"
+  },
+  UNIDAD_MEDIDA:{
+    CREAR: "/crear-unidad-medida",
+    EDITAR: "/editar-unidad-medida",
+    LISTAR: "/lista-unidad-medida"
   }
 };

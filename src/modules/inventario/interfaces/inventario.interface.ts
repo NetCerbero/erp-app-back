@@ -1,6 +1,7 @@
 export interface IInventario {
   productoId: number;
   almacenId: number;
-  cantidad: number;
   empresaId: number;
+  cantidadUnidadBase: number;
+  costoUnidadBase: number
 }

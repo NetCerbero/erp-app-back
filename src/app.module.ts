@@ -14,6 +14,9 @@ import { ArchivoModule } from './modules/archivo/archivo.module';
 import { CompraModule } from './modules/compra/compra.module';
 import { InventarioModule } from './modules/inventario/inventario.module';
 import { CodigoCorrelativoModule } from './modules/codigo-correlativo/codigo-correlativo.module';
+import { UnidadMedidaModule } from './modules/unidad-medida/unidad-medida.module';
+import { ProveedorModule } from './modules/proveedor/proveedor.module';
+import { TasaCambioModule } from './modules/tasa-cambio/tasa-cambio.module';
 
 @Module({
   imports: [
@@ -31,7 +34,10 @@ import { CodigoCorrelativoModule } from './modules/codigo-correlativo/codigo-cor
     ArchivoModule,
     CompraModule,
     InventarioModule,
-    CodigoCorrelativoModule
+    CodigoCorrelativoModule,
+    UnidadMedidaModule,
+    ProveedorModule,
+    TasaCambioModule,
   ],
 })
 export class AppModule {

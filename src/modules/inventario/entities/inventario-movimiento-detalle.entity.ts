@@ -6,10 +6,10 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  PrimaryColumn,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { InventarioMovimiento } from './inventario-movimiento.entity';
+import { Dominio } from 'src/modules/dominio/entities/dominio.entity';
 
 @Entity('inventario_movimiento_detalle')
 export class InventarioMovimientoDetalle extends BaseMeta {
@@ -18,8 +18,8 @@ export class InventarioMovimientoDetalle extends BaseMeta {
 
   @Column({
     type: 'numeric',
-    scale: 2,
-    precision: 15,
+    scale: 6,
+    precision: 18,
     transformer: new ColumnNumericTransformer(),
   })
   cantidad: number;
@@ -27,17 +27,57 @@ export class InventarioMovimientoDetalle extends BaseMeta {
   @Column({
     type: 'numeric',
     name: 'costo_unitario',
-    scale: 2,
-    precision: 15,
+    scale: 6,
+    precision: 18,
     transformer: new ColumnNumericTransformer(),
-    nullable: true,
   })
-  costoUnitario?: number;
+  costoUnitario: number;
 
-  @Column({ type: 'smallint' })
-  signo: number;
+  @Column({
+    type: 'numeric',
+    name: 'costo_total',
+    scale: 6,
+    precision: 18,
+    transformer: new ColumnNumericTransformer(),
+  })
+  costoTotal: number;
+
+  // unidad base
+  @Column({
+    name: 'cantidad_unidad_base',
+    type: 'numeric',
+    scale: 6,
+    precision: 18,
+    transformer: new ColumnNumericTransformer(),
+  })
+  cantidadUnidadBase: number;
+
+  @Column({
+    type: 'numeric',
+    name: 'costo_unitario_moneda_base',
+    scale: 6,
+    precision: 18,
+    transformer: new ColumnNumericTransformer(),
+  })
+  costoUnitarioMonedaBase: number;
+
+  @Column({
+    type: 'numeric',
+    name: 'costo_total_moneda_base',
+    scale: 6,
+    precision: 18,
+    transformer: new ColumnNumericTransformer(),
+  })
+  costoTotalMonedaBase: number;
 
   // Relacion
+
+  @Column({ name: 'empresa_id' })
+  empresaId: number;
+
+  @ManyToOne(() => Dominio, { createForeignKeyConstraints: false })
+  @JoinColumn({ name: 'empresa_id' })
+  empresa: Dominio;
 
   @Column({ name: 'producto_id' })
   productoId: number;

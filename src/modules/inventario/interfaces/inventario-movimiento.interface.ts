@@ -1,11 +1,15 @@
-import { DOCUMENTO_ORIGEN, TIPO_MOVIMIENTO } from 'src/core';
+import { DOCUMENTO_ORIGEN, MONEDA, TIPO_MOVIMIENTO } from 'src/core';
 
 export interface IMovimientoDetalle {
   cantidad: number;
-  costoUnitario?: number;
-  signo: number;
+  costoUnitario: number;
+  costoTotal: number;
+  cantidadUnidadBase: number;
+  costoUnitarioMonedaBase: number;
+  costoTotalMonedaBase: number;
   productoId: number;
   almacenId: number;
+  empresaId: number;
 }
 
 export interface IMovimiento {
@@ -16,5 +20,7 @@ export interface IMovimiento {
   observacion: string;
   empresaId: number;
   usuarioId: number;
+  monedaId: MONEDA;
+  almacenId: number,
   detalles: IMovimientoDetalle[];
 }

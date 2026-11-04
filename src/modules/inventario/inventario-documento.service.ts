@@ -35,6 +35,8 @@ import { InventarioMovimientoService } from './inventario-movimiento.service';
 import { InventarioMovimiento } from './entities/inventario-movimiento.entity';
 import { InventarioMovimientoDetalle } from './entities/inventario-movimiento-detalle.entity';
 import { AlmacenService } from '../sucursal/almacen.service';
+import { magicSelect } from 'src/core/common';
+import { bulkUpdate } from 'src/core/orm/update-builk.orm';
 
 @Injectable()
 export class InventarioDocumentoService {
@@ -122,7 +124,8 @@ export class InventarioDocumentoService {
         id: item.id,
         estado: item.estado,
         codigo: item.codigo,
-        tipo: DOCUMENTO_ORIGEN[item.tipo],
+        tipoTxt: DOCUMENTO_ORIGEN[item.tipo],
+        tipo: item.tipo,
         fechaDocumento: item.fechaDocumento,
         observacion: item.observacion,
         almacenOrigen: `${item.almacenOrigen.nombre} - ${item.almacenOrigen.sucursal.ubicacion.abreviatura}`,
@@ -180,7 +183,7 @@ export class InventarioDocumentoService {
             manager,
           );
         }
-        
+
         // revisar si existe el inventario inicial
         if (!existe && payload.tipo === DOCUMENTO_ORIGEN.INICIAL) {
           const existeMovimiento =
@@ -271,24 +274,59 @@ export class InventarioDocumentoService {
                 )
               : new Map();
 
-            await Promise.all(
-              existentes.map((detalle) => {
-                let cantidadAnterior;
-                if (seEstaConfirmando) {
-                  cantidadAnterior =
-                    inventario.get(detalle.productoId + '')?.cantidad ||
-                    undefined;
-                }
+            // await Promise.all(
+            //   existentes.map((detalle) => {
+            //     let cantidadAnterior;
+            //     if (seEstaConfirmando) {
+            //       cantidadAnterior =
+            //         inventario.get(detalle.productoId + '')?.cantidad ||
+            //         undefined;
+            //     }
 
-                manager.update(InventarioDocumentoDetalle, detalle.id, {
-                  cantidad: detalle.cantidad,
-                  cantidadAnterior: cantidadAnterior,
-                  productoId: detalle.productoId,
-                  observacion: detalle.observacion,
-                  empresaId: detalle.empresaId,
-                });
-              }),
-            );
+            //     manager.update(InventarioDocumentoDetalle, detalle.id, {
+            //       cantidad: detalle.cantidad,
+            //       cantidadAnterior: cantidadAnterior,
+            //       productoId: detalle.productoId,
+            //       observacion: detalle.observacion,
+            //       empresaId: detalle.empresaId,
+            //     });
+            //   }),
+            // );
+
+            const listaActualizar = existentes.map((detalle) => {
+              let cantidadAnterior;
+              if (seEstaConfirmando) {
+                cantidadAnterior =
+                  inventario.get(detalle.productoId + '')?.cantidad ||
+                  undefined;
+              }
+              return {
+                id: detalle.id,
+                cantidad: detalle.cantidad,
+                cantidadAnterior: cantidadAnterior,
+                productoId: detalle.productoId,
+                observacion: detalle.observacion,
+                empresaId: detalle.empresaId,
+              };
+            });
+
+            listaActualizar.length &&
+              (await bulkUpdate(
+                manager,
+                InventarioDocumentoDetalle,
+                listaActualizar,
+                {
+                  key: 'id',
+                  fields: [
+                    'id',
+                    'cantidad',
+                    'cantidadAnterior',
+                    'productoId',
+                    'observacion',
+                    'empresaId',
+                  ],
+                },
+              ));
 
             const nuevosSave =
               nuevos.length > 0
@@ -312,7 +350,9 @@ export class InventarioDocumentoService {
           } catch (error) {
             Logger.error(error);
             throw new ConflictException(
-              `No se ha podido editar el documento #${existe!.codigo}.`,
+              payload.estado == ESTADO_DOCUMENTO.CONFIRMADO
+                ? `No se ha podido confirmar el documento #${existe!.codigo}.`
+                : `No se ha podido editar el documento #${existe!.codigo}.`,
             );
           }
         }
@@ -336,62 +376,62 @@ export class InventarioDocumentoService {
     operacion: InventarioDocumento,
   ) {
     try {
-      if (
-        [DOCUMENTO_ORIGEN.AJUSTE, DOCUMENTO_ORIGEN.INICIAL].includes(
-          operacion.tipo,
-        )
-      ) {
-        await this.movimientoInventarioService.registrarTransaccion(manager, {
-          documentoId: operacion.id,
-          documentoOrigen: operacion.tipo,
-          empresaId: operacion.empresaId,
-          fechaDocumento: operacion.fechaDocumento,
-          observacion: `#${operacion.codigo}`,
-          tipo:
-            operacion.tipo == DOCUMENTO_ORIGEN.AJUSTE
-              ? TIPO_MOVIMIENTO.AJUSTE
-              : TIPO_MOVIMIENTO.ENTRADA,
-          usuarioId: auth.id,
-          detalles: operacion.detalles.map((item) => ({
-            almacenId: operacion.almacenOrigenId,
-            cantidad: Math.abs((item.cantidadAnterior ?? 0) - item.cantidad),
-            productoId: item.productoId,
-            signo: (item.cantidadAnterior ?? 0) > item.cantidad ? -1 : 1,
-          })),
-        });
-      } else if (DOCUMENTO_ORIGEN.TRASPASO == operacion.tipo) {
-        await this.movimientoInventarioService.registrarTransaccion(manager, {
-          documentoId: operacion.id,
-          documentoOrigen: operacion.tipo,
-          empresaId: operacion.empresaId,
-          fechaDocumento: operacion.fechaDocumento,
-          observacion: `#${operacion.codigo}`,
-          tipo: TIPO_MOVIMIENTO.SALIDA,
-          usuarioId: auth.id,
-          detalles: operacion.detalles.map((item) => ({
-            almacenId: operacion.almacenOrigenId,
-            cantidad: Math.abs(item.cantidad),
-            productoId: item.productoId,
-            signo: -1, //NEGATIVO
-          })),
-        });
+      // if (
+      //   [DOCUMENTO_ORIGEN.AJUSTE, DOCUMENTO_ORIGEN.INICIAL].includes(
+      //     operacion.tipo,
+      //   )
+      // ) {
+      //   await this.movimientoInventarioService.registrarTransaccion(manager, {
+      //     documentoId: operacion.id,
+      //     documentoOrigen: operacion.tipo,
+      //     empresaId: operacion.empresaId,
+      //     fechaDocumento: operacion.fechaDocumento,
+      //     observacion: `#${operacion.codigo}`,
+      //     tipo:
+      //       operacion.tipo == DOCUMENTO_ORIGEN.AJUSTE
+      //         ? TIPO_MOVIMIENTO.AJUSTE
+      //         : TIPO_MOVIMIENTO.ENTRADA,
+      //     usuarioId: auth.id,
+      //     detalles: operacion.detalles.map((item) => ({
+      //       almacenId: operacion.almacenOrigenId,
+      //       cantidad: Math.abs((item.cantidadAnterior ?? 0) - item.cantidad),
+      //       productoId: item.productoId,
+      //       signo: (item.cantidadAnterior ?? 0) > item.cantidad ? -1 : 1,
+      //     })),
+      //   });
+      // } else if (DOCUMENTO_ORIGEN.TRASPASO == operacion.tipo) {
+      //   await this.movimientoInventarioService.registrarTransaccion(manager, {
+      //     documentoId: operacion.id,
+      //     documentoOrigen: operacion.tipo,
+      //     empresaId: operacion.empresaId,
+      //     fechaDocumento: operacion.fechaDocumento,
+      //     observacion: `#${operacion.codigo}`,
+      //     tipo: TIPO_MOVIMIENTO.SALIDA,
+      //     usuarioId: auth.id,
+      //     detalles: operacion.detalles.map((item) => ({
+      //       almacenId: operacion.almacenOrigenId,
+      //       cantidad: Math.abs(item.cantidad),
+      //       productoId: item.productoId,
+      //       signo: -1, //NEGATIVO
+      //     })),
+      //   });
 
-        await this.movimientoInventarioService.registrarTransaccion(manager, {
-          documentoId: operacion.id,
-          documentoOrigen: operacion.tipo,
-          empresaId: operacion.empresaId,
-          fechaDocumento: operacion.fechaDocumento,
-          observacion: `#${operacion.codigo}`,
-          tipo: TIPO_MOVIMIENTO.ENTRADA,
-          usuarioId: auth.id,
-          detalles: operacion.detalles.map((item) => ({
-            almacenId: operacion.almacenDestinoId,
-            cantidad: Math.abs(item.cantidad),
-            productoId: item.productoId,
-            signo: 1, //POSITIVO
-          })),
-        });
-      }
+      //   await this.movimientoInventarioService.registrarTransaccion(manager, {
+      //     documentoId: operacion.id,
+      //     documentoOrigen: operacion.tipo,
+      //     empresaId: operacion.empresaId,
+      //     fechaDocumento: operacion.fechaDocumento,
+      //     observacion: `#${operacion.codigo}`,
+      //     tipo: TIPO_MOVIMIENTO.ENTRADA,
+      //     usuarioId: auth.id,
+      //     detalles: operacion.detalles.map((item) => ({
+      //       almacenId: operacion.almacenDestinoId,
+      //       cantidad: Math.abs(item.cantidad),
+      //       productoId: item.productoId,
+      //       signo: 1, //POSITIVO
+      //     })),
+      //   });
+      // }
     } catch (error) {
       Logger.error(error);
       throw new ConflictException(
@@ -420,5 +460,160 @@ export class InventarioDocumentoService {
         empresaId: auth.dominio,
       })
       .getOne();
+  }
+
+  async obtenerDetalle(auth: IAuth, operacionId: number) {
+    const item = await this.documentoRep
+      .createQueryBuilder('d')
+      .select(
+        magicSelect({
+          d: [
+            'id',
+            'estado',
+            'codigo',
+            'tipo',
+            'fechaDocumento',
+            'observacion',
+            'createdAt',
+          ],
+          // DETALLE
+          det: [
+            'id',
+            'cantidad',
+            'cantidadAnterior',
+            'observacion',
+            'productoId',
+          ],
+          pro: ['id', 'nombre', 'identificador'],
+          // ALMACEN ORIGEN
+          alo: ['id', 'nombre'],
+          suco: ['id', 'identificador', 'direccion'],
+          uo: ['id', 'nombre', 'abreviatura'],
+          // ALMACEN DESTINO
+          ald: ['id', 'nombre'],
+          sucd: ['id', 'identificador', 'direccion'],
+          ud: ['id', 'nombre', 'abreviatura'],
+          // USUARIO PERSONA
+          usr: ['id'],
+          prs: ['id', 'nombreCompleto'],
+        }),
+      )
+      .innerJoin('d.detalles', 'det')
+      .innerJoin('det.producto', 'pro')
+      .innerJoin('d.almacenOrigen', 'alo')
+      .innerJoin('alo.sucursal', 'suco')
+      .innerJoin('suco.ubicacion', 'uo')
+      .leftJoin('d.almacenDestino', 'ald')
+      .leftJoin('ald.sucursal', 'sucd')
+      .leftJoin('sucd.ubicacion', 'ud')
+      .leftJoin('d.usuario', 'usr')
+      .leftJoin('usr.persona', 'prs')
+      .where('d.id = :operacionId', { operacionId })
+      .andWhere('d.empresaId = :empresaId', { empresaId: auth.dominio })
+      .getOne();
+
+    if (!item) throw new NotFoundException(MSG.NOT_FOUND);
+
+    const esTraspado =
+      item.almacenDestino && item.tipo == DOCUMENTO_ORIGEN.TRASPASO;
+
+    return {
+      id: item.id,
+      estado: item.estado,
+      codigo: item.codigo,
+      tipo: item.tipo,
+      tipoTxt: DOCUMENTO_ORIGEN[item.tipo],
+      fechaDocumento: item.fechaDocumento,
+      createdAt: item.createdAt,
+      observacion: item.observacion,
+      //ALMACEN ORIGEN
+      ubicacionOrigen: item.almacenOrigen.sucursal.ubicacion.nombre,
+      ubicacionAbreviaturaOrigen:
+        item.almacenOrigen.sucursal.ubicacion.abreviatura,
+      sucursalOrigen: item.almacenOrigen.sucursal.identificador,
+      sucursalDireccionOrigen: item.almacenOrigen.sucursal.direccion,
+      almacenOrigen: item.almacenOrigen.nombre,
+      almacenOrigenTxt: `${item.almacenOrigen.nombre} - ${item.almacenOrigen.sucursal.ubicacion.abreviatura}`,
+
+      //ALMACEN DESTINO
+      ubicacionDestino: esTraspado
+        ? item?.almacenDestino?.sucursal?.ubicacion?.nombre
+        : null,
+      ubicacionAbreviaturaDestino: esTraspado
+        ? item?.almacenDestino?.sucursal?.ubicacion?.abreviatura
+        : null,
+      sucursalDestino: esTraspado
+        ? item?.almacenDestino?.sucursal?.identificador
+        : null,
+      sucursalDireccionDestino: esTraspado
+        ? item?.almacenDestino?.sucursal?.direccion
+        : null,
+      almacenDestino: esTraspado ? item?.almacenDestino?.nombre : null,
+      almacenDestinoTxt: esTraspado
+        ? `${item?.almacenDestino?.nombre} - ${item?.almacenDestino?.sucursal?.ubicacion?.abreviatura}`
+        : null,
+
+      usuario: item?.usuario?.persona?.nombreCompleto,
+      detalles: item.detalles.map((det) => {
+        return {
+          id: det.id,
+          cantidad: det.cantidad,
+          cantidadAnterior: det.cantidadAnterior,
+          observacion: det.observacion,
+          productoId: det.productoId,
+          nombre: det.producto.nombre,
+          identificador: det.producto.identificador,
+        };
+      }),
+    };
+  }
+
+  async confirmar(auth: IAuth, operacionId: number) {
+    const find = await this.obtener(auth, operacionId);
+    if (!find) throw new NotFoundException(MSG.NOT_FOUND);
+    // CONFIRMAR
+    return await this.crear(auth, {
+      id: find.id,
+      almacenOrigenId: find.almacenOrigenId,
+      almacenDestinoId: find.almacenDestinoId,
+      fechaDocumento: find.fechaDocumento.toString(),
+      estado: ESTADO_DOCUMENTO.CONFIRMADO,
+      observacion: find.observacion,
+      tipo: find.tipo,
+      detalles: find.detalles.map((item) => {
+        return {
+          cantidad: item.cantidad,
+          observacion: item.observacion,
+          productoId: item.productoId,
+          id: item.id,
+        };
+      }),
+    });
+  }
+
+  async anular(auth: IAuth, operacionId: number) {
+    console.log("revisar !!",operacionId)
+    await this.documentoRep.manager.transaction(async (manager) => {
+      const operacion = await this.bloquearOperacion(auth, operacionId, manager);
+      if (!operacion) throw new ConflictException(MSG.NOT_FOUND);
+      console.log(operacion)
+      if (operacion.estado == ESTADO_DOCUMENTO.CONFIRMADO) {
+        throw new ConflictException(
+          `La operacion #${operacion?.codigo} ya fue procesada.`,
+        );
+      }
+
+      if (operacion.estado == ESTADO_DOCUMENTO.ANULADO) {
+        throw new ConflictException(
+          `La operacion #${operacion?.codigo} ya fue anulada.`,
+        );
+      }
+
+      await manager.update(InventarioDocumento, operacion.id, {
+        usuarioId: auth.id,
+        estado: ESTADO_DOCUMENTO.ANULADO,
+      });
+      return true;
+    });
   }
 }

@@ -1,4 +1,6 @@
+import { Type } from 'class-transformer';
 import {
+  arrayMinSize,
   ArrayMinSize,
   IsArray,
   IsBoolean,
@@ -8,22 +10,42 @@ import {
   IsOptional,
   IsString,
   MaxLength,
+  Min,
+  ValidateNested,
 } from 'class-validator';
-import { ESTADO, TIPO_PRODUCTO } from 'src/core';
+import { ESTADO, MONEDA, TIPO_PRODUCTO } from 'src/core';
 
+export class CreateListaPrecioProducto {
+   @IsOptional()
+  @IsNumber()
+  id?: number
+  
+  @IsDefined()
+  @IsNumber()
+  listaPrecioId: number;
+
+  @IsDefined()
+  @IsNumber()
+  @Min(0)
+  precio: number;
+
+  @IsDefined()
+  @IsEnum(MONEDA)
+  monedaId: number;
+
+  @IsDefined()
+  @IsNumber()
+  unidadId: number;
+}
 export class CreateProductoDto {
+  @IsOptional()
+  @IsNumber()
+  id?: number
+
   @IsDefined()
   @IsString()
   @MaxLength(255)
   nombre: string;
-
-  @IsOptional()
-  @IsNumber()
-  costo: number;
-
-  @IsDefined()
-  @IsNumber()
-  precioBase: number;
 
   @IsOptional()
   @IsString()
@@ -51,9 +73,10 @@ export class CreateProductoDto {
   @ArrayMinSize(1)
   disponiblesEn: number[];
 
-  // @IsDefined()
-  // @IsArray()
-  // @IsNumber({}, { each: true })
-  // @ArrayMinSize(1)
-  // grupos: number[]
+  @IsDefined()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @ArrayMinSize(1)
+  @Type(() => CreateListaPrecioProducto)
+  listaPrecios: CreateListaPrecioProducto[];
 }

@@ -5,7 +5,7 @@ export const MSG = {
     UPDATE: "Ups!, no se puede actualizar el registro",
     SAVE: "Ups!, no se ha podido guardar el registro",
     DELETE: "Ups!, no se ha podido eliminar el registro",
-    LIST: "Upds!, no se ha podido listar los registros",
+    LIST: "Ups!, no se ha podido listar los registros",
     NOT_USER_FOUND: "Ups!, no se ha encontrado el usuario",
     NOT_USER_AVAILABLE: "Ups!, usuario no disponible",
     INVALID_CREDENTIALS: "Credenciales invalidas",
@@ -22,5 +22,6 @@ export const MSG = {
     INVENTARIO_INICIAL_CARGADO: "Ups!, el almacén ya tiene registrado un inventario inicial.",
     INVENTARIO_EXISTE_MOVIMIENTO: 'Ups!, el almacén ya tiene movimientos de inventario, no es posible registrar un inventario inicial.',
     ALMACEN_NOT_EXISTS: "Ups!, el almacén no existe.",
-    ALMACEN_NOT_DESTINO: "Ups!, almacén destino debe ser ingresado."
+    ALMACEN_NOT_DESTINO: "Ups!, almacén destino debe ser ingresado.",
+    ES_VACIO: "Ups!, sin datos para procesar."
 }

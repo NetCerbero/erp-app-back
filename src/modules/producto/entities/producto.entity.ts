@@ -15,6 +15,8 @@ import {
 import { Dominio } from '../../dominio/entities/dominio.entity';
 import { ProductoSucursal } from './producto-sucursal.entity';
 import { Inventario } from '../../inventario/entities/inventario.entity';
+import { ProductoListaPrecioDetalle } from './producto-lista-precio-detalle.entity';
+import { UnidadMedida } from 'src/modules/unidad-medida/entities/unidad-medida.entity';
 
 @Entity('producto')
 export class Producto extends BaseMeta {
@@ -26,24 +28,6 @@ export class Producto extends BaseMeta {
 
   @Column({ type: 'varchar', length: 255 })
   nombre: string;
-
-  @Column({
-    type: 'numeric',
-    scale: 2,
-    precision: 15,
-    transformer: new ColumnNumericTransformer(),
-    nullable: true,
-  })
-  costo: number;
-
-  @Column({
-    type: 'numeric',
-    scale: 2,
-    precision: 15,
-    transformer: new ColumnNumericTransformer(),
-    name: 'precio_base',
-  })
-  precioBase: number;
 
   @Column({ type: 'text', nullable: true })
   descripcion: string;
@@ -73,4 +57,9 @@ export class Producto extends BaseMeta {
 
   @OneToMany(() => Inventario, (inv) => inv.producto)
   stocks: Inventario[];
+
+  @OneToMany(() => ProductoListaPrecioDetalle, (plp) => plp.producto, {
+    cascade: true,
+  })
+  detallePrecios: ProductoListaPrecioDetalle[];
 }

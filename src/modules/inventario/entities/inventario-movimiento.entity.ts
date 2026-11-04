@@ -8,10 +8,16 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { BaseMeta, DOCUMENTO_ORIGEN, TIPO_MOVIMIENTO } from '../../../core';
+import {
+  BaseMeta,
+  DOCUMENTO_ORIGEN,
+  MONEDA,
+  TIPO_MOVIMIENTO,
+} from '../../../core';
 import { Dominio } from '../../dominio/entities/dominio.entity';
 import { Inventario } from './inventario.entity';
 import { InventarioMovimientoDetalle } from './inventario-movimiento-detalle.entity';
+import { Almacen } from 'src/modules/sucursal/entities/almacen.entity';
 
 @Index('idx_movimiento_referencia', ['documentoOrigen', 'documentoId'], {
   where: '"deleted_at" IS NULL',
@@ -44,7 +50,18 @@ export class InventarioMovimiento extends BaseMeta {
   @Column({ type: 'text', nullable: true })
   observacion: string;
 
+  @Column({ name: 'moneda_id' })
+  monedaId: MONEDA;
+
   // RELACION
+
+  @Column({ name: 'almacen_id' })
+  almacenId: number;
+
+  @ManyToOne(() => Almacen)
+  @JoinColumn({ name: 'almacen_id' })
+  almacen: Almacen;
+
   @Column({ name: 'empresa_id' })
   empresaId: number;
 

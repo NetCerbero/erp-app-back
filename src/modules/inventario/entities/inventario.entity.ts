@@ -13,7 +13,6 @@ import {
 import { Almacen } from '../../sucursal/entities/almacen.entity';
 import { Dominio } from '../../dominio/entities/dominio.entity';
 import { Producto } from '../../producto/entities/producto.entity';
-import { InventarioMovimiento } from './inventario-movimiento.entity';
 
 @Index(
   'uq_inventario_producto_almacen_active',
@@ -31,25 +30,24 @@ export class Inventario {
   id: number;
 
   @Column({
+    name: 'cantidad_unidad_base',
     type: 'numeric',
-    scale: 2,
-    precision: 15,
+    scale: 6,
+    precision: 18,
     transformer: new ColumnNumericTransformer(),
   })
-  cantidad: number;
+  cantidadUnidadBase: number;
 
   @Column({
+    name: 'costo_unidad_base',
     type: 'numeric',
-    scale: 2,
-    precision: 15,
+    scale: 6,
+    precision: 18,
     transformer: new ColumnNumericTransformer(),
-    name: 'cantidad_minima',
-    nullable: true,
   })
-  cantidadMinima: number;
+  costoUnidadBase: number;
 
   //Relacion
-
   @Column({ name: 'producto_id' })
   productoId: number;
 

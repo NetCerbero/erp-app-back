@@ -1,0 +1,5 @@
+export enum MEDIO_PAGO {
+  EFECTIVO = 1,
+  TRANSFERENCIA = 2,
+  TARJETA = 3,
+}

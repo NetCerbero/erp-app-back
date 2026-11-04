@@ -24,7 +24,7 @@ export const VENTA_PAGES = [
     },
     {
         nombre: "CAJA",
-        url: PAGE.CASH.LIST,
+        url: PAGE.CAJA.LIST,
         icono: "Mail",
         visibleEnMenu: true,
         acciones: [

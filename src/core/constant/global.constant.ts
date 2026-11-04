@@ -3,6 +3,11 @@ export enum ESTADO {
   INACTIVO = 0,
 }
 
+export enum ESTADO_CAJA {
+  ABIERTO = 1,
+  CERRADO = 0,
+}
+
 export enum ESTRATEGIA_SESION {
   NORMAL = 'NORMAL',
   GOOGLE = 'GOOGLE',

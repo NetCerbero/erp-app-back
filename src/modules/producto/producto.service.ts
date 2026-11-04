@@ -8,6 +8,7 @@ import { UpdateProductoDto } from './dto/update-producto.dto';
 import {
   ACCION,
   ESTADO,
+  getMapFromArray,
   IAuth,
   MSG,
   QueryListDto,
@@ -17,6 +18,10 @@ import { ProductoRepository } from './repositories/producto.repository';
 import { SucursalService } from '../sucursal/sucursal.service';
 import { In } from 'typeorm';
 import { ProductoSucursalRepository } from './repositories/producto-sucursal.repository';
+import { ProductoListaPrecioDetalleRepository } from './repositories/producto-lista-precio-detalle.repository';
+import { magicSelect } from 'src/core/common';
+import { ProductoListaPrecioDetalle } from './entities/producto-lista-precio-detalle.entity';
+import { bulkUpdate } from 'src/core/orm/update-builk.orm';
 
 @Injectable()
 export class ProductoService {
@@ -24,6 +29,7 @@ export class ProductoService {
     private readonly productoRep: ProductoRepository,
     private readonly productoSucRep: ProductoSucursalRepository,
     private readonly sucursalSrv: SucursalService,
+    private readonly listaPrecioDetRep: ProductoListaPrecioDetalleRepository,
   ) {}
 
   private async availableBranches(auth: IAuth, ids: number[]) {
@@ -42,68 +48,153 @@ export class ProductoService {
   //   return branches;
   // }
 
-  async create(auth: IAuth, createProductoDto: CreateProductoDto) {
-    const { disponiblesEn, ...rst } = createProductoDto;
-    const branchProducts = disponiblesEn.map((s) =>
-      this.productoSucRep.create({ sucursalId: s }),
+  async create(auth: IAuth, payload: CreateProductoDto) {
+    console.log(payload);
+
+    const { disponiblesEn, listaPrecios, ...rst } = payload;
+
+    const detallePrecios = listaPrecios.map((lp) =>
+      this.listaPrecioDetRep.create({
+        listaPrecioId: lp.listaPrecioId,
+        precio: lp.precio,
+        unidadId: lp.unidadId,
+        empresaId: auth.dominio,
+        productoId: payload.id,
+        id: lp.id,
+      }),
     );
-    return await this.productoRep.save({
-      ...rst,
-      disponiblesEn: branchProducts,
-      empresaId: auth.dominio,
-    });
+
+    const branchProducts = disponiblesEn.map((s) =>
+      this.productoSucRep.create({ sucursalId: s, productoId: payload.id }),
+    );
+
+    console.log('createProductoDto', payload);
+
+    if (!payload.id) {
+      return await this.productoRep.save({
+        ...rst,
+        disponiblesEn: branchProducts,
+        empresaId: auth.dominio,
+        detallePrecios: detallePrecios,
+      });
+    } else {
+      const producto = await this.findOne(auth, payload.id);
+      if (!producto) return;
+
+      const { disponiblesEn } = producto;
+
+      const { listaPrecioNueva, listaPrecioActualizar } = detallePrecios.reduce(
+        (prev, act) => {
+          if (act.id) {
+            prev.listaPrecioActualizar.push(act);
+          } else {
+            prev.listaPrecioNueva.push(act);
+          }
+          return prev;
+        },
+        {
+          listaPrecioNueva: [] as ProductoListaPrecioDetalle[],
+          listaPrecioActualizar: [] as ProductoListaPrecioDetalle[],
+        },
+      );
+
+      const mapExisteSucursal = getMapFromArray(branchProducts, ['sucursalId']);
+
+      const eliminarRegistroSuc = disponiblesEn.filter(
+        (e) => !mapExisteSucursal.get(e.sucursalId + ''),
+      );
+
+      const mapExisteRel = getMapFromArray(disponiblesEn, ['sucursalId']);
+
+      const nuevosRelacionarSuc = branchProducts.filter((e) => {
+        return !mapExisteRel.get(e.sucursalId + '');
+      });
+
+      eliminarRegistroSuc.length > 0 &&
+        (await this.productoSucRep.softDelete(
+          eliminarRegistroSuc.map((e) => e.id),
+        ));
+      nuevosRelacionarSuc.length > 0 &&
+        (await this.productoSucRep.save(nuevosRelacionarSuc));
+
+      listaPrecioNueva.length > 0 &&
+        (await this.listaPrecioDetRep.save(listaPrecioNueva));
+      listaPrecioActualizar.length > 0 &&
+        (await bulkUpdate(
+          this.productoRep.manager,
+          ProductoListaPrecioDetalle,
+          listaPrecioActualizar,
+          {
+            key: 'id',
+            fields: ['id', 'precio', 'listaPrecioId', 'unidadId', 'empresaId'],
+          },
+        ));
+
+      await this.productoRep.update(payload.id, {
+        ...rst,
+      });
+    }
   }
 
   async findAll(auth: IAuth, filtro: QueryListDto) {
-    return await this.productoRep.find({
-      order: { id: 'desc' },
+    const listar = await this.productoRep.find({
+      select: {
+        id: true,
+        nombre: true,
+        identificador: true,
+        estado: true,
+        descripcion: true,
+        createdAt: true,
+        tipo: true,
+        disponiblesEn: {
+          id: true,
+          sucursal: {
+            id: true,
+            identificador: true,
+            ubicacion: {
+              id: true,
+              abreviatura: true,
+            },
+          },
+        },
+      },
       where: {
         empresaId: auth.dominio,
         ...(filtro.estado ? { estado: filtro.estado } : {}),
       },
+      order: { id: 'desc' },
       relations: [
         'disponiblesEn',
         'disponiblesEn.sucursal',
         'disponiblesEn.sucursal.ubicacion',
-        //'grupos',
       ],
     });
-  }
-
-  async findAllToPos(auth: IAuth) {
-    const [sucursales, productos] = await Promise.all([
-      this.sucursalSrv.findByIds(
-        auth,
-        auth.sucursales,
-        { estado: ESTADO.ACTIVO },
-        ['ubicacion'],
-      ),
-      this.productoRep.find({
-        order: { id: 'desc' },
-        where: {
-          empresaId: auth.dominio,
-          estado: ESTADO.ACTIVO,
-          disponiblesEn: {
-            sucursal: { estado: ESTADO.ACTIVO, id: In(auth.sucursales) },
-          },
-          //grupos: { id: In(auth.grupos) },
-        },
-        relations: [
-          'disponiblesEn',
-          //'grupos',
-          'listaProducto',
-          'listaProducto.producto',
-        ],
-      }),
-    ]);
-
-    return { sucursales, productos };
+    return listar.map((item) => {
+      return {
+        id: item.id,
+        nombre: item.nombre,
+        identificador: item.identificador,
+        estado: item.estado,
+        descripcion: item.descripcion,
+        createdAt: item.createdAt,
+        tipo: item.tipo,
+        disponiblesEn: item.disponiblesEn.map((dis) => {
+          const suc = dis.sucursal.identificador;
+          const abr = dis.sucursal.ubicacion.abreviatura;
+          return {
+            id: dis.id,
+            sucursalId: dis.sucursal.id,
+            label: `${suc} - ${abr}`,
+          };
+        }),
+      };
+    });
   }
 
   async findOne(auth: IAuth, id: number) {
     return await this.productoRep.findOne({
       where: { id, empresaId: auth.dominio },
-      relations: ['disponiblesEn'],
+      relations: ['disponiblesEn', 'detallePrecios'],
     });
   }
 
@@ -141,6 +232,8 @@ export class ProductoService {
     const tieneSucursal = !!auth.sucursal;
     if (!tieneSucursal) throw new ConflictException(MSG.SIN_SUCURSAL);
 
+    console.log({ listarCompleto });
+
     const lista = await this.productoRep.find({
       select: {
         id: true,
@@ -174,7 +267,8 @@ export class ProductoService {
   }
 
   async listarProductoOperacion(auth: IAuth) {
-    const listarCompleto = auth.permisos.get(
+    const listarCompleto =
+      auth.permisos.get(
         ACCION.REGISTRAR_OPERACION_EN_OTRO_ALMACEN_INVENTARIO,
       ) || false;
     const tieneSucursal = !!auth.sucursal;
@@ -203,8 +297,7 @@ export class ProductoService {
         stocks: {
           id: true,
           almacenId: true,
-          cantidad: true,
-          cantidadMinima: true,
+          cantidadUnidadBase: true,
         },
       },
       where: {
@@ -245,5 +338,39 @@ export class ProductoService {
       };
     });
     return listaMap;
+  }
+
+  async listarProductoPuntoVenta(
+    auth: IAuth,
+    sucursalId: number,
+    almacenId: number,
+  ) {
+    const query = this.productoRep
+      .createQueryBuilder('p')
+      .select(
+        magicSelect({
+          p: [
+            'id',
+            'nombre',
+            'tipo',
+            'descripcion',
+            'estado',
+            'tpv',
+            'controlStock',
+          ],
+          dp: ['id', 'listaPrecioId', 'unidadId', 'precio'],
+          sp: ['id', 'cantidadUnidadBase', 'almacenId'],
+        }),
+      )
+      .leftJoin('p.detallePrecios', 'dp')
+      .leftJoin('p.stocks', 'sp', 'sp.almacenId = :almacenId', { almacenId })
+      .innerJoin('p.disponiblesEn', 'dsuc', 'dsuc.sucursalId = :sucursalId', {
+        sucursalId: sucursalId,
+      })
+      .where('p.empresaId = :empresaId', { empresaId: auth.dominio })
+      .andWhere('p.estado = :estado', { estado: ESTADO.ACTIVO })
+      .andWhere('p.tpv = :tpv', { tpv: true });
+
+    return await query.getMany();
   }
 }

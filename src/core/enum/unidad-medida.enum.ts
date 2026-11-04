@@ -1,0 +1,3 @@
+export enum CATEGORIA_UNIDAD_MEDIDA {
+  CANTIDAD = 1,
+}

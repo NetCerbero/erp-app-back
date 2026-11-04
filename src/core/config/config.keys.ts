@@ -1,4 +1,5 @@
 export enum Configuration {
+  ENV="ENV",
   PORT = 'PORT',
   DATABASE_HOST = 'DATABASE_HOST',
   DATABASE_USER = 'DATABASE_USER',

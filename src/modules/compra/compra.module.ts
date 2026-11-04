@@ -7,6 +7,8 @@ import { CompraDetalleRepository } from './repositories/compra-detalle.repositor
 import { CompraEstadoRepository } from './repositories/compra-estado.repository';
 import { InventarioModule } from '../inventario/inventario.module';
 import { SucursalModule } from '../sucursal/sucursal.module';
+import { UnidadMedidaModule } from '../unidad-medida/unidad-medida.module';
+import { TasaCambioModule } from '../tasa-cambio/tasa-cambio.module';
 
 @Module({
   imports: [
@@ -16,7 +18,9 @@ import { SucursalModule } from '../sucursal/sucursal.module';
       CompraEstadoRepository,
     ]),
     InventarioModule,
-    SucursalModule
+    SucursalModule,
+    UnidadMedidaModule,
+    TasaCambioModule,
   ],
   controllers: [CompraController],
   providers: [

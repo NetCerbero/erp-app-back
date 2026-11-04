@@ -14,13 +14,14 @@ import { Modulo } from '../../modules/permiso/entities/modulo.entity';
 import { MODULOS } from '../../core/permission';
 
 export const createInitialData = async (dataSource: DataSource) => {
+  const ENV = process.env.ENV
   console.log('INGRESANDO A EJECUTAR EL SEEDERS!!...');
   // CREANDO TODO LOS CONCEPTOS
   const conceptoRepo = dataSource.getRepository(Concepto);
   const listaConcepto = LIST_CONCEPTO();
   const metaConcepto = dataSource.getMetadata(Concepto);
   await conceptoRepo.manager.query(
-    `truncate ${metaConcepto.tableName} restart identity`,
+    `truncate ${metaConcepto.schema}.${metaConcepto.tableName} restart identity`,
   );
   const listaConceptoSave = await conceptoRepo.save(listaConcepto);
 
@@ -29,7 +30,7 @@ export const createInitialData = async (dataSource: DataSource) => {
   const listaModulo = MODULOS;
   const metaModulo = dataSource.getMetadata(Modulo);
   await moduloRepo.manager.query(
-    `truncate ${metaModulo.tableName} restart identity cascade`,
+    `truncate ${metaModulo.schema}.${metaModulo.tableName} restart identity cascade`,
   );
   await moduloRepo.save(listaModulo);
 
